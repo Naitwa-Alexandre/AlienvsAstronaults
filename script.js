@@ -114,6 +114,11 @@ function handleProjectiles(){
 }
 
 //defenders
+const defender1 = new Image();
+defender1.src = 'sprites/defender1.png';
+const defender2 = new Image();
+defender2.src = 'sprites/defender2.png'
+
 class Defender {
     constructor(x, y){
         this.x = x;
@@ -121,9 +126,16 @@ class Defender {
         this.width = cellSize - cellGap * 2;
         this.height = cellSize - cellGap * 2;
         this.shooting = false;
+        this.shootNow = false;
         this.health = 100;
         this.projectiles = [];
         this.timer = 0;
+        this.frameX = 0;
+        this.frameY = 0;
+        this.spriteWidth = 194;
+        this.spriteHeight = 194;
+        this.minFrame = 0;
+        this.maxFrame = 16;
     }
     draw(){
         ctx.fillStyle = 'blue';
@@ -131,17 +143,26 @@ class Defender {
         ctx.fillStyle = 'gold';
         ctx.font = '30px Orbitron';
         ctx.fillText(Math.floor(this.health), this.x + 15, this.y + 30);
+        //ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
+        ctx.drawImage(defender1, this.frameX * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, this.x, this.y, this.width, this.height);
     }
     update(){
-        if (this.shooting){
-            this.timer++;
-            if (this.timer % 100 === 0){
-                projectiles.push(new Projectiles(this.x + 70, this.y + 50));
-            }
-        } else {
-            this.timer = 0;
+        if (frame % 8 === 0) {
+            if (this.frameX < this.maxFrame) this.frameX++;
+            else this.frameX = this.minFrame;
+            if (this.frameX === 15) this.shootNow = true;
         }
-
+        if (this.shooting){
+            this.minFrame = 0;
+            this.maxFrame = 15;
+        } else {
+            this.minFrame = 17;
+            this.maxFrame = 23;
+        }
+        if (this.shooting && this.shootNow){
+           projectiles.push(new Projectiles(this.x + 70, this.y + 35));
+           this.shootNow = false;
+        }
     }
 }
 canvas.addEventListener('click', function(){
@@ -222,6 +243,9 @@ const enemyTypes = [];
 const enemy1 = new Image();
 enemy1.src = 'sprites/enemy1.png';
 enemyTypes.push(enemy1);
+const enemy2 = new Image();
+enemy2.src = 'sprites/enemy2.png';
+enemyTypes.push(enemy2);
 
 
 class Enemy {
@@ -234,7 +258,7 @@ class Enemy {
         this.movement = this.speed;
         this.health = 100;
         this.maxHealth = this.health;
-        this.enemyType = enemyTypes[0];
+        this.enemyType = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
         this.frameX = 0;
         this.frameY = 0;
         this.minFrame = 0;
@@ -244,14 +268,14 @@ class Enemy {
     }
     update(){
         this.x -= this.movement;
-        if (frame % 10 === 0 ) {
+        if (frame % 9 === 0 ) {
             if (this.frameX < this.maxFrame) this.frameX++;
             else this.frameX = this.minFrame;
         }
     }
     draw(){
-        ctx.fillStyle = 'red';
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+        //ctx.fillStyle = 'red';
+        //ctx.fillRect(this.x, this.y, this.width, this.height);
         ctx.fillStyle = 'black';
         ctx.font = '30px Orbitron';
         ctx.fillText(Math.floor(this.health), this.x + 15, this.y + 30);
